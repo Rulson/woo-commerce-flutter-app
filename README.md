@@ -67,6 +67,13 @@ A modern Flutter e-commerce mobile application (Android & iOS) with WooCommerce 
 
 ## Configuration
 
+### WordPress Setup
+
+1. **Set Permalinks**
+   - Go to WordPress Dashboard → Settings → Permalinks
+   - Select "Post name" option
+   - Click "Save Changes"
+
 ### WooCommerce Setup
 
 1. **Enable REST API**
@@ -115,7 +122,7 @@ lib/
 
 ## Dependencies
 
-Key dependencies used in this project:
+"Key dependencies used in this project (can be substituted with alternatives or removed entirely):"
 
 ```yaml
 dependencies:
