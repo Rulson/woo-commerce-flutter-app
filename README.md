@@ -19,12 +19,6 @@ A modern Flutter e-commerce mobile application (Android & iOS) with WooCommerce 
 - **Responsive Design**: Modern UI with Material Design components
 - **Debug Support**: cURL logging for API debugging
 
-## Screenshots
-
-The app includes the following screens:
-- **Home Screen**: Product grid with category filtering
-- **Cart Screen**: Shopping cart management
-- **Checkout Screen**: Order placement with payment options
 
 ## Setup Instructions
 
@@ -55,7 +49,7 @@ The app includes the following screens:
    
    If you need to use different credentials, edit the `.env` file:
    ```env
-   # Your WooCommerce store URL (must end with trailing slash)
+   # Your WooCommerce store URL 
    WOOCOMMERCE_BASE_URL=https://your-domain.com/
    
    # WooCommerce REST API credentials
@@ -185,156 +179,29 @@ The app includes a cURL interceptor that logs all API requests. Check the consol
 
 ## Deployment
 
-### Android Deployment
-
-#### Prerequisites
-- Android Studio installed
-- Android SDK configured
-- Keystore file for app signing (for release builds)
-
-#### Development Build
+### Android
 ```bash
-# Debug build for testing
+# Development
 flutter build apk --debug
 
-# Profile build for performance testing
-flutter build apk --profile
-```
-
-#### Release Build
-```bash
-# Create release APK
+# Release
 flutter build apk --release
-
-# Create split APKs for different architectures 
-flutter build apk --split-per-abi --release
 ```
 
-#### Testing Before Release
+### iOS
 ```bash
-# Install on connected device
-flutter install
-
-# Run tests
-flutter test
-
-# Analyze code
-flutter analyze
-```
-
-
-### iOS Deployment
-
-#### Prerequisites
-- macOS with Xcode installed
-- Apple Developer Account
-- iOS device or simulator for testing
-
-#### Development Build
-```bash
-# Debug build for testing
+# Development
 flutter build ios --debug
 
-# Profile build for performance testing
-flutter build ios --profile
-```
-
-#### Release Build
-```bash
-# Create release build
+# Release
 flutter build ios --release
 ```
 
-#### Testing Before Release
-```bash
-# Run on iOS simulator
-flutter run -d ios
+### Production Setup
+1. Configure production environment variables in `.env`
+2. Test on real devices
+3. For App Store: Use Xcode to archive and upload
+4. For Play Store: Create signed APK or App Bundle
 
-# Run on connected iOS device
-flutter run -d <device-id>
+**Note**: This app is designed for mobile platforms (Android and iOS) only.
 
-# Run tests
-flutter test
-
-# Analyze code
-flutter analyze
-```
-
-#### App Store Preparation
-1. **Configure App Signing**:
-   - Open `ios/Runner.xcworkspace` in Xcode
-   - Set up your Team and Bundle Identifier
-   - Configure signing certificates and provisioning profiles
-
-2. **Update App Information**:
-   - Edit `ios/Runner/Info.plist` for app metadata
-   - Update app icons in `ios/Runner/Assets.xcassets`
-   - Configure app permissions and capabilities
-
-3. **Archive and Upload**:
-   ```bash
-   # Open in Xcode for final configuration
-   open ios/Runner.xcworkspace
-   ```
-   - In Xcode: Product → Archive
-   - Use Organizer to upload to App Store Connect
-
-#### iOS-Specific Configuration
-- **App Icons**: Update all required sizes in `ios/Runner/Assets.xcassets/AppIcon.appiconset`
-- **Launch Screen**: Customize `ios/Runner/Base.lproj/LaunchScreen.storyboard`
-- **Permissions**: Add required permissions to `ios/Runner/Info.plist`
-- **Capabilities**: Enable required capabilities in Xcode (Push Notifications, etc.)
-
-### Environment Variables for Production
-
-Before deploying, ensure your production environment variables are properly configured:
-
-1. **Create production `.env` file**:
-   ```env
-   WOOCOMMERCE_BASE_URL=https://your-production-domain.com/
-   WOOCOMMERCE_CONSUMER_KEY=your_production_consumer_key
-   WOOCOMMERCE_CONSUMER_SECRET=your_production_consumer_secret
-   ```
-
-2. **Verify API endpoints** are accessible from mobile devices
-
-3. **Test all features** with production credentials
-
-### Pre-Deployment Checklist
-
-#### General
-- [ ] All tests pass (`flutter test`)
-- [ ] Code analysis clean (`flutter analyze`)
-- [ ] Environment variables configured for production
-- [ ] API endpoints tested and working
-- [ ] App icons and splash screen updated
-- [ ] App name and description finalized
-
-#### Android Specific
-- [ ] Keystore file created and configured
-- [ ] `key.properties` file set up
-- [ ] App signing configured in `build.gradle`
-- [ ] APK/App Bundle builds successfully
-- [ ] App tested on different Android versions
-
-#### iOS Specific
-- [ ] Bundle identifier configured
-- [ ] Team and signing certificates set up
-- [ ] Provisioning profiles configured
-- [ ] App icons in all required sizes
-- [ ] Launch screen customized
-- [ ] App tested on different iOS versions
-
-### Troubleshooting Deployment
-
-#### Common Android Issues
-- **Build fails**: Check Android SDK installation and Gradle configuration
-- **Signing errors**: Verify keystore file and `key.properties` configuration
-- **Permission errors**: Check `android/app/src/main/AndroidManifest.xml`
-
-#### Common iOS Issues
-- **Code signing errors**: Verify certificates and provisioning profiles in Xcode
-- **Archive fails**: Check bundle identifier and team configuration
-- **Upload rejected**: Verify app metadata and compliance with App Store guidelines
-
-**Note**: This app is designed for mobile platforms (Android and iOS) only. Desktop and web platforms have been removed to focus on mobile development.
