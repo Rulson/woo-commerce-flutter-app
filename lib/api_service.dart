@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:dio_intercept_to_curl/dio_intercept_to_curl.dart';
 import 'api_constant.dart';
 
 class ApiService {
@@ -11,7 +12,7 @@ class ApiService {
   );
 
   ApiService() {
-    _dio.interceptors.add(CurlInterceptor());
+    _dio.interceptors.add(DioInterceptToCurl());
   }
 
   Future<Response> getProducts({int perPage = 10, int page = 1}) async {
@@ -136,79 +137,5 @@ class ApiService {
       default:
         return 'An error occurred: ${e.message}';
     }
-  }
-}
-
-class CurlInterceptor extends Interceptor {
-  @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final curl = _buildCurlCommand(options);
-    print('🌐 cURL Command:');
-    print(curl);
-    print('📤 Request Headers: ${options.headers}');
-    if (options.data != null) {
-      print('📦 Request Body: ${options.data}');
-    }
-    super.onRequest(options, handler);
-  }
-
-  @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print('📥 Response Status: ${response.statusCode}');
-    print('📥 Response Headers: ${response.headers}');
-    print('📥 Response Data: ${response.data}');
-    super.onResponse(response, handler);
-  }
-
-  @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    print('❌ Error: ${err.message}');
-    print('❌ Error Type: ${err.type}');
-    print('❌ Error Response: ${err.response?.data}');
-    super.onError(err, handler);
-  }
-
-  String _buildCurlCommand(RequestOptions options) {
-    final buffer = StringBuffer();
-    buffer.write('curl --location');
-    buffer.write(' -X ${options.method.toUpperCase()}');
-
-    // Add headers
-    options.headers.forEach((key, value) {
-      if (key != 'content-length') {
-        buffer.write(' -H "$key: $value"');
-      }
-    });
-
-    // Construct the URL properly
-    String url = options.baseUrl;
-    if (!url.endsWith('/') && !options.path.startsWith('/')) {
-      url += '/';
-    }
-    url += options.path;
-
-    // Add query parameters
-    if (options.queryParameters.isNotEmpty) {
-      final queryString = options.queryParameters.entries
-          .map((e) => '${e.key}=${Uri.encodeComponent(e.value.toString())}')
-          .join('&');
-      url += '?$queryString';
-    }
-
-    buffer.write(' \'$url\'');
-
-    // Add body for POST/PUT requests
-    if (options.data != null &&
-        (options.method == 'POST' ||
-            options.method == 'PUT' ||
-            options.method == 'PATCH')) {
-      if (options.data is Map) {
-        buffer.write(' -d \'${options.data}\'');
-      } else {
-        buffer.write(' -d "${options.data}"');
-      }
-    }
-
-    return buffer.toString();
   }
 }

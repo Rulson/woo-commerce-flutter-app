@@ -533,7 +533,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         final orderData = _buildOrderData(customerId);
         
         // Call the actual API to create order
-        final response = await _apiService.createOrder(orderData);
+        await _apiService.createOrder(orderData);
         
         if (!mounted) return;
         
@@ -555,7 +555,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             actions: [
               TextButton(
                 onPressed: () {
-                  if (!mounted) return;
                   Navigator.pop(dialogContext); // Close dialog
                   cartCubit.clearCart(); // Clear cart
                   Navigator.popUntil(navigatorContext, (route) => route.isFirst); // Go to home
@@ -568,11 +567,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } catch (error) {
         if (!mounted) return;
         
-        Navigator.pop(context); // Close loading dialog
+        final navigatorContext = context;
+        Navigator.pop(navigatorContext); // Close loading dialog
         
         // Show error dialog
         showDialog(
-          context: context,
+          context: navigatorContext,
           builder: (dialogContext) => AlertDialog(
             title: const Text('Order Failed'),
             content: Text('Failed to place order: $error'),

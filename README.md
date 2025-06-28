@@ -130,6 +130,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^8.1.3          # State management
   dio: ^5.3.2                   # HTTP client
+  dio_intercept_to_curl: ^0.2.0 # cURL logging for API debugging
   cached_network_image: ^3.3.0  # Image caching
   flutter_badge: ^0.0.3         # Badge widget for cart
 ```
