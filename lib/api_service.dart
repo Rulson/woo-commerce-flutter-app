@@ -10,11 +10,6 @@ class ApiService {
     ),
   );
 
-  static const String consumerKey =
-      'ck_d6d77c247d4d496be2e4712a9dcefd18ccdcd41a';
-  static const String consumerSecret =
-      'cs_698a5dc09f7f622c920ea2eb76ffa527fe945489';
-
   ApiService() {
     _dio.interceptors.add(CurlInterceptor());
   }
