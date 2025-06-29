@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/product_cubit.dart';
 import '../cubit/cart_cubit.dart';
+import '../cubit/auth_cubit.dart';
 import '../widgets/product_card.dart';
 import '../model/category_model.dart';
 import 'cart_screen.dart';
@@ -21,6 +22,11 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     context.read<ProductCubit>().fetchCategories();
     context.read<ProductCubit>().fetchProducts();
+    
+    // Load cart items if user is authenticated
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CartCubit>().loadCart();
+    });
   }
 
   void _onCategorySelected(Category? category) {
@@ -70,6 +76,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
+              );
+            },
+          ),
+          // Logout button
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Logout'),
+                  content: const Text('Are you sure you want to logout?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        context.read<AuthCubit>().logout();
+                      },
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
               );
             },
           ),

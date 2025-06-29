@@ -5,6 +5,7 @@ A modern Flutter e-commerce mobile application (Android & iOS) with WooCommerce 
 ## Features
 
 ### Core Features
+- **User Authentication**: Login and registration with WooCommerce integration
 - **Product Browsing**: Browse products with images, descriptions, and pricing
 - **Category Filtering**: Filter products by categories with a persistent category filter
 - **Shopping Cart**: Add/remove items, update quantities, and view cart total
@@ -82,7 +83,12 @@ A modern Flutter e-commerce mobile application (Android & iOS) with WooCommerce 
    - Set permissions to "Read/Write"
    - Copy the Consumer Key and Consumer Secret
 
-2. **Required WooCommerce Settings**
+2. **Enable User Registration**
+   - Go to WordPress Dashboard → Settings → General
+   - Check "Anyone can register" option
+   - Set "New User Default Role" to "Customer"
+
+3. **Required WooCommerce Settings**
    - Ensure products are published and visible
    - Set up shipping zones and methods
    - Configure payment gateways (Stripe for card payments, COD for cash)
@@ -90,11 +96,16 @@ A modern Flutter e-commerce mobile application (Android & iOS) with WooCommerce 
 ### API Endpoints
 
 The app uses the following WooCommerce REST API endpoints:
+- `GET /wp-json/wc/v3/customers` - User login (by email)
+- `POST /wp-json/wc/v3/customers` - User registration
 - `GET /wp-json/wc/v3/products` - Fetch products
 - `GET /wp-json/wc/v3/products/categories` - Fetch categories
-- `GET /wp-json/wc/v3/customers` - Get customer by email
-- `POST /wp-json/wc/v3/customers` - Create customer
+- `PUT /wp-json/wc/v3/customers/{id}` - Update customer
 - `POST /wp-json/wc/v3/orders` - Create order
+- `GET /wp-json/wc/v3/cart-items` - Get cart items
+- `POST /wp-json/wc/v3/cart-items` - Add item to cart
+- `PUT /wp-json/wc/v3/cart-items/{id}` - Update cart item quantity
+- `DELETE /wp-json/wc/v3/cart-items/{id}` - Remove item from cart
 
 ## Project Structure
 

@@ -122,6 +122,185 @@ class ApiService {
     }
   }
 
+  Future<Response> login(String email, String password) async {
+    try {
+      // First, try to find the customer by email
+      final customerResponse = await _dio.get(
+        getCustomerUrl,
+        queryParameters: {
+          'consumer_key': consumerKey,
+          'consumer_secret': consumerSecret,
+          'email': email,
+        },
+      );
+      
+      if (customerResponse.data is List && customerResponse.data.isNotEmpty) {
+        // Customer exists, return the customer data
+        return customerResponse;
+      } else {
+        // Customer not found
+        throw Exception('Invalid email or password');
+      }
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<Response> register({
+    required String email,
+    required String password,
+    required String firstName,
+    required String lastName,
+    String? phone,
+  }) async {
+    try {
+      final response = await _dio.post(
+        getCustomerUrl,
+        queryParameters: {
+          'consumer_key': consumerKey,
+          'consumer_secret': consumerSecret,
+        },
+        data: {
+          'email': email,
+          'password': password,
+          'first_name': firstName,
+          'last_name': lastName,
+          'username': email.split('@').first, // Use email prefix as username
+          'billing': {
+            'first_name': firstName,
+            'last_name': lastName,
+            'email': email,
+            'phone': phone ?? '',
+          },
+          'shipping': {
+            'first_name': firstName,
+            'last_name': lastName,
+          },
+        },
+      );
+      return response;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<Response> updateCustomer(
+    int customerId, {
+    String? firstName,
+    String? lastName,
+    String? phone,
+    Map<String, dynamic>? billing,
+    Map<String, dynamic>? shipping,
+  }) async {
+    try {
+      final updateData = <String, dynamic>{};
+      
+      if (firstName != null) updateData['first_name'] = firstName;
+      if (lastName != null) updateData['last_name'] = lastName;
+      if (phone != null) updateData['phone'] = phone;
+      if (billing != null) updateData['billing'] = billing;
+      if (shipping != null) updateData['shipping'] = shipping;
+
+      final response = await _dio.put(
+        '$getCustomerUrl/$customerId',
+        queryParameters: {
+          'consumer_key': consumerKey,
+          'consumer_secret': consumerSecret,
+        },
+        data: updateData,
+      );
+      return response;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  // Cart Management Endpoints
+  Future<Response> createCartItem(int customerId, int productId, int quantity) async {
+    try {
+      final response = await _dio.post(
+        'wp-json/wc/v3/cart-items',
+        queryParameters: {
+          'consumer_key': consumerKey,
+          'consumer_secret': consumerSecret,
+        },
+        data: {
+          'customer_id': customerId,
+          'product_id': productId,
+          'quantity': quantity,
+        },
+      );
+      return response;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<Response> getCartItems(int customerId) async {
+    try {
+      final response = await _dio.get(
+        'wp-json/wc/v3/cart-items',
+        queryParameters: {
+          'consumer_key': consumerKey,
+          'consumer_secret': consumerSecret,
+          'customer_id': customerId,
+        },
+      );
+      return response;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<Response> updateCartItem(int cartItemId, int quantity) async {
+    try {
+      final response = await _dio.put(
+        'wp-json/wc/v3/cart-items/$cartItemId',
+        queryParameters: {
+          'consumer_key': consumerKey,
+          'consumer_secret': consumerSecret,
+        },
+        data: {
+          'quantity': quantity,
+        },
+      );
+      return response;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<Response> deleteCartItem(int cartItemId) async {
+    try {
+      final response = await _dio.delete(
+        'wp-json/wc/v3/cart-items/$cartItemId',
+        queryParameters: {
+          'consumer_key': consumerKey,
+          'consumer_secret': consumerSecret,
+        },
+      );
+      return response;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
+  Future<Response> clearCart(int customerId) async {
+    try {
+      final response = await _dio.delete(
+        'wp-json/wc/v3/cart-items',
+        queryParameters: {
+          'consumer_key': consumerKey,
+          'consumer_secret': consumerSecret,
+          'customer_id': customerId,
+        },
+      );
+      return response;
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    }
+  }
+
   String _handleDioError(DioException e) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:

@@ -24,7 +24,11 @@ class CartScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
+                    Icon(
+                      Icons.shopping_cart_outlined,
+                      size: 64,
+                      color: Colors.grey,
+                    ),
                     SizedBox(height: 16),
                     Text(
                       'Your cart is empty',
@@ -126,10 +130,7 @@ class CartScreen extends StatelessWidget {
 class CartItemCard extends StatelessWidget {
   final CartItem item;
 
-  const CartItemCard({
-    super.key,
-    required this.item,
-  });
+  const CartItemCard({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -148,9 +149,8 @@ class CartItemCard extends StatelessWidget {
                     ? CachedNetworkImage(
                         imageUrl: item.product.images.first.src,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        placeholder: (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
                         errorWidget: (context, url, error) => Container(
                           color: Colors.grey[300],
                           child: const Icon(Icons.image_not_supported),
@@ -189,8 +189,23 @@ class CartItemCard extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () {
-                          context.read<CartCubit>().removeItem(item.product.id);
+                        onPressed: () async {
+                          try {
+                            await context.read<CartCubit>().removeItem(
+                              item.product.id,
+                            );
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Failed to remove item: ${e.toString()}',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
                         },
                         icon: const Icon(Icons.remove_circle_outline),
                         color: Colors.red,
@@ -203,8 +218,23 @@ class CartItemCard extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: () {
-                          context.read<CartCubit>().addItem(item.product);
+                        onPressed: () async {
+                          try {
+                            await context.read<CartCubit>().addItem(
+                              item.product,
+                            );
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Failed to add item: ${e.toString()}',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
                         },
                         icon: const Icon(Icons.add_circle_outline),
                         color: Colors.green,
@@ -227,8 +257,23 @@ class CartItemCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 IconButton(
-                  onPressed: () {
-                    context.read<CartCubit>().removeItem(item.product.id);
+                  onPressed: () async {
+                    try {
+                      await context.read<CartCubit>().removeItem(
+                        item.product.id,
+                      );
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Failed to remove item: ${e.toString()}',
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
                   },
                   icon: const Icon(Icons.delete_outline),
                   color: Colors.red,
@@ -240,4 +285,4 @@ class CartItemCard extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -68,22 +68,51 @@ class ProductCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<CartCubit>().addItem(product);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${product.name} added to cart'),
-                          duration: const Duration(seconds: 2),
+                  child: BlocBuilder<CartCubit, CartState>(
+                    builder: (context, state) {
+                      final isLoading = state is CartLoading;
+                      
+                      return ElevatedButton.icon(
+                        onPressed: isLoading ? null : () async {
+                          try {
+                            await context.read<CartCubit>().addItem(product);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${product.name} added to cart'),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to add item: ${e.toString()}'),
+                                  backgroundColor: Colors.red,
+                                  duration: const Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        icon: isLoading 
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : const Icon(Icons.add_shopping_cart),
+                        label: Text(isLoading ? 'Adding...' : 'Add to Cart'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
                         ),
                       );
                     },
-                    icon: const Icon(Icons.add_shopping_cart),
-                    label: const Text('Add to Cart'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
                   ),
                 ),
               ],

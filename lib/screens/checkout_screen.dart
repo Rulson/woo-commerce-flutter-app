@@ -533,18 +533,40 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         final orderData = _buildOrderData(customerId);
         
         // Call the actual API to create order
-        await _apiService.createOrder(orderData);
-        
+        final orderResponse = await _apiService.createOrder(orderData);
+        if (orderResponse.statusCode != 201) {
+          // Print response for debugging
+          print('Order creation failed: \\nStatus: \\${orderResponse.statusCode}\\nData: \\${orderResponse.data}');
+          if (!mounted) return;
+          final currentContext = context;
+          Navigator.pop(currentContext); // Close loading dialog
+          showDialog(
+            context: currentContext,
+            barrierDismissible: false,
+            builder: (dialogContext) => AlertDialog(
+              title: const Text('Order Failed'),
+              content: Text('Failed to place order: \\nStatus: \\${orderResponse.statusCode}\\nMessage: \\${orderResponse.data}'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
         if (!mounted) return;
-        
-        // Store context before async operation
-        final navigatorContext = context;
-        
-        Navigator.pop(navigatorContext); // Close loading dialog
-        
+        // Store context before async operations
+        final currentContext = context;
+        // Close loading dialog
+        Navigator.pop(currentContext);
         // Show success dialog
         showDialog(
-          context: navigatorContext,
+          context: currentContext,
+          barrierDismissible: false,
           builder: (dialogContext) => AlertDialog(
             title: const Text('Order Placed Successfully!'),
             content: Text(
@@ -557,7 +579,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 onPressed: () {
                   Navigator.pop(dialogContext); // Close dialog
                   cartCubit.clearCart(); // Clear cart
-                  Navigator.popUntil(navigatorContext, (route) => route.isFirst); // Go to home
+                  Navigator.popUntil(currentContext, (route) => route.isFirst); // Go to home
                 },
                 child: const Text('OK'),
               ),
@@ -567,12 +589,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } catch (error) {
         if (!mounted) return;
         
-        final navigatorContext = context;
-        Navigator.pop(navigatorContext); // Close loading dialog
+        // Store context before async operations
+        final currentContext = context;
+        
+        // Close loading dialog
+        Navigator.pop(currentContext);
         
         // Show error dialog
         showDialog(
-          context: navigatorContext,
+          context: currentContext,
+          barrierDismissible: false,
           builder: (dialogContext) => AlertDialog(
             title: const Text('Order Failed'),
             content: Text('Failed to place order: $error'),
